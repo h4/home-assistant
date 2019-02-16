@@ -1,0 +1,23 @@
+zone.home:
+  track_ios: true
+zone.work:
+  track_ios: true
+sensor.fett_cpu_temp:
+  friendly_name: CPU Temperature
+  icon: mdi:thermometer
+sensor.fett_mb_temp:
+  friendly_name: Motherboard Temperature
+  icon: mdi:thermometer
+sensor.fett_cpu_fan:
+  friendly_name: CPU Fan
+  icon: mdi:fan
+sensor.fett_mb_fan:
+  friendly_name: Motherboard Fan
+  icon: mdi:fan
+sensor.fett_power_fan:
+  friendly_name: Power Fan
+  icon: mdi:fan
+light.yeelight_ceiling3_7c49ebb682c7:
+  friendly_name: ChildRoom Ceiling Light
+light.yeelight_ceiling3_7c49ebae2e67:
+  friendly_name: LivingRoom Ceiling Lamp

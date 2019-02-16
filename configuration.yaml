@@ -1,0 +1,245 @@
+homeassistant:
+  name: Dzheda
+  latitude: !secret core_latitude 
+  longitude: !secret core_longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 0
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/Moscow
+  # Customization file
+  customize: !include customize.yaml
+  auth_providers:
+   - type: homeassistant
+   - type: legacy_api_password
+   - type: trusted_networks
+
+# Show links to resources in log and frontend
+# introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+http:
+  # Secrets are defined in the file secrets.yaml
+  api_password: !secret http_password
+  trusted_networks:
+    - 192.168.2.0/24
+  # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+  # base_url: example.duckdns.org:8123
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  include_used_components: true
+
+# Discover some devices automatically
+discovery:
+  ignore:
+    - roku
+    - yeelight
+zeroconf:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+# conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+apcupsd:
+
+# Weather prediction
+sensor:
+  - platform: moon
+  - platform: speedtest
+    monitored_conditions:
+      - ping
+      - download
+      - upload
+    minute:
+      - 0
+      - 15
+      - 30
+      - 45 
+  - platform: apcupsd 
+    resources:
+      - bcharge
+      - linev
+      - loadpct
+      - nominv
+      - numxfers
+      - status
+      - timeleft
+      - tonbatt
+  - platform: systemmonitor
+    resources:
+      - type: memory_use_percent
+      - type: processor_use
+      - type: last_boot
+      - type: disk_use_percent
+        arg: /mnt/data
+      - type: disk_use_percent
+        arg: /mnt/media
+      - type: disk_free
+        arg: /mnt/data
+      - type: disk_free
+        arg: /mnt/media
+  - platform: cups
+    printers:
+      - Printer
+    host: 192.168.2.100
+  - platform: snmp
+    name: 'Fett MB Fan'
+    host: 192.168.2.100
+    baseoid: 1.3.6.1.4.1.2021.13.16.3.1.3.8
+    unit_of_measurement: 'RPM'
+  - platform: snmp
+    name: 'Fett CPU Fan'
+    host: 192.168.2.100
+    baseoid: 1.3.6.1.4.1.2021.13.16.3.1.3.7
+    unit_of_measurement: 'RPM'
+  - platform: snmp
+    name: 'Fett Power Fan'
+    host: 192.168.2.100
+    baseoid: 1.3.6.1.4.1.2021.13.16.3.1.3.9
+    unit_of_measurement: 'RPM'
+  - platform: snmp
+    name: 'Fett CPU Temp'
+    host: 192.168.2.100
+    baseoid: 1.3.6.1.4.1.2021.13.16.2.1.3.10
+    value_template: '{{((value | int) / 1000) | round(2)}}'
+    unit_of_measurement: 'ºC'
+  - platform: snmp
+    name: 'Fett MB Temp'
+    host: 192.168.2.100
+    baseoid: 1.3.6.1.4.1.2021.13.16.2.1.3.11
+    value_template: '{{((value | int) / 1000) | round(2)}}'
+    unit_of_measurement: 'ºC'
+  - platform: co2signal
+    token: 9a9672f1f0b483a8
+
+  - platform: template
+    sensors:
+            humiditi_depth:
+                    friendly_name: "Humidifier Depth"
+                    value_template: "{{ states.fan.xiaomi_miio_device.attributes.depth }}"
+            childroom_temp:
+                    friendly_name: "Childroom Temperature"
+                    value_template: "{{ states.fan.xiaomi_miio_device.attributes.temperature }}"
+                    unit_of_measurement: 'ºC'
+            childroom_humid:
+                    friendly_name: "Childroom Humidity"
+                    value_template: "{{ states.fan.xiaomi_miio_device.attributes.humidity }}"
+                    unit_of_measurement: '%'
+            humidifier_speed:
+                    friendly_name: "Humidifier Speed"
+                    value_template: "{{ states.fan.xiaomi_miio_device.attributes.speed }}"
+
+# Text to speech
+#tts:
+#  - platform: google
+
+xiaomi_aqara:
+  gateways:
+    - key: !secret xiaomi_aqara_key
+
+fan:
+  - platform: xiaomi_miio
+    host: 192.168.2.102
+    token: !secret xiaomi_miio_token
+
+device_tracker:
+  - platform: linksys_smart
+    host: 192.168.2.1
+    consider_home: 300
+    track_new_devices: yes
+#  - platform: bluetooth_tracker
+#  - platform: keenetic_ndms2
+#    host: 192.168.4.1
+#    username: !secret keenetic_ndms2_login
+#    password: !secret keenetic_ndms2_password
+#    track_new_devices: yes
+
+light:
+  - platform: yeelight
+    devices:
+      192.168.2.141:
+        name: Child Room
+        model: ceiling3
+      192.168.2.113:
+        name: Living Room
+        model: ceiling3
+
+camera:
+  - platform: mjpeg
+    mjpeg_url: http://192.168.2.100:8089/
+    name: Entrance WebCam
+
+ios:
+
+# Cloud
+# cloud:
+#
+mqtt:
+  broker: 192.168.2.100
+  discovery: true
+  discovery_prefix: home
+
+weather:
+  - platform: openweathermap
+    api_key: !secret openweathermap_api_key
+  - platform: met
+
+zone:
+  - name: Work
+    latitude: !secret zone_work_latitude
+    longitude: !secret zone_work_longitude
+    icon: mdi:factory
+  - name: Kernovo
+    latitude: !secret zone_kernovo_latitude
+    longitude: !secret zone_kernovo_longitude
+    icon: mdi:castle
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret 656603113:AAH7CRK3MeEfxGjoPpA2DmXMCnGr5qmZh7E
+    proxy_url: !secret telegram_proxy_url
+    proxy_params: 
+      username: !secret telegram_proxy_user
+      password: !secret telegram_proxy_password
+    allowed_chat_ids: 
+      - !secret telegram_allowed_chat_ids_1
+
+notify:
+  - name: alarm
+    platform: telegram
+    chat_id: !secret telegram_allowed_chat_ids_1
+
+logger:
+  default: error
+  #logs:
+    #xiaomi_gateway: debug
+    #yeelight: debug
+
+system_health:
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml

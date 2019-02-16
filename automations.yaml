@@ -1,0 +1,16 @@
+- id: '1538348059196'
+  alias: Door Lock
+  trigger:
+  - entity_id: binary_sensor.entrance_lock
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - delay: 0:05
+  - condition: state
+    entity_id: binary_sensor.entrance_lock
+    state: 'on'
+  - data:
+      message: The entrance door is open for 5 minutes
+    service: notify.alarm
