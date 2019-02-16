@@ -219,7 +219,7 @@ zone:
 
 telegram_bot:
   - platform: polling
-    api_key: !secret 656603113:AAH7CRK3MeEfxGjoPpA2DmXMCnGr5qmZh7E
+    api_key: !secret telegram_api_key
     proxy_url: !secret telegram_proxy_url
     proxy_params: 
       username: !secret telegram_proxy_user
