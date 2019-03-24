@@ -13,8 +13,10 @@ homeassistant:
   auth_providers:
    - type: homeassistant
    - type: legacy_api_password
+     api_password: !secret http_password
    - type: trusted_networks
-
+     trusted_networks:
+       - 192.168.2.0/24
 # Show links to resources in log and frontend
 # introduction:
 
@@ -26,9 +28,6 @@ config:
 
 http:
   # Secrets are defined in the file secrets.yaml
-  api_password: !secret http_password
-  trusted_networks:
-    - 192.168.2.0/24
   # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
   # base_url: example.duckdns.org:8123
 
@@ -65,19 +64,17 @@ sun:
 
 apcupsd:
 
+speedtestdotnet:
+  scan_interval:
+    minutes: 15
+  monitored_conditions:
+    - ping
+    - download
+    - upload
+
 # Weather prediction
 sensor:
   - platform: moon
-  - platform: speedtest
-    monitored_conditions:
-      - ping
-      - download
-      - upload
-    minute:
-      - 0
-      - 15
-      - 30
-      - 45 
   - platform: apcupsd 
     resources:
       - bcharge
@@ -101,10 +98,10 @@ sensor:
         arg: /mnt/data
       - type: disk_free
         arg: /mnt/media
-  - platform: cups
-    printers:
-      - Printer
-    host: 192.168.2.100
+#  - platform: cups
+#    printers:
+#      - Printer
+#    host: 192.168.2.100
   - platform: snmp
     name: 'Fett MB Fan'
     host: 192.168.2.100
@@ -132,8 +129,8 @@ sensor:
     baseoid: 1.3.6.1.4.1.2021.13.16.2.1.3.11
     value_template: '{{((value | int) / 1000) | round(2)}}'
     unit_of_measurement: 'ºC'
-  - platform: co2signal
-    token: 9a9672f1f0b483a8
+    #  - platform: co2signal
+    #    token: 9a9672f1f0b483a8
 
   - platform: template
     sensors:
@@ -162,7 +159,7 @@ xiaomi_aqara:
 
 fan:
   - platform: xiaomi_miio
-    host: 192.168.2.102
+    host: 192.168.2.104
     token: !secret xiaomi_miio_token
 
 device_tracker:
@@ -208,11 +205,11 @@ weather:
   - platform: met
 
 zone:
-  - name: Work
+  - name: work
     latitude: !secret zone_work_latitude
     longitude: !secret zone_work_longitude
     icon: mdi:factory
-  - name: Kernovo
+  - name: kernovo
     latitude: !secret zone_kernovo_latitude
     longitude: !secret zone_kernovo_longitude
     icon: mdi:castle
@@ -234,9 +231,15 @@ notify:
 
 logger:
   default: error
-  #logs:
+  logs:
+    xiaomi_miio: debug
+    miio: debug
     #xiaomi_gateway: debug
     #yeelight: debug
+
+googlehome:
+  devices:
+    - host: 192.168.2.115
 
 system_health:
 
